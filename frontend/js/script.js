@@ -152,7 +152,6 @@ async function addToCart(productId) {
     }
 }
 
-
 async function registerUser() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -166,12 +165,15 @@ async function registerUser() {
             body: JSON.stringify({ username, password })
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-            alert('User registered successfully');
+            alert(result.msg);
         } else {
-            alert('Registration failed');
+            alert(result.msg);
         }
     } catch (error) {
         console.error('Error:', error);
     }
 }
+

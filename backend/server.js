@@ -25,7 +25,7 @@ app.use(express.json());
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 // Use routes
-app.use('/api/users', require('./routes/users'));
+app.use('/api/users', require('./routes/user'));
 
 // Example route
 app.get('/', (req, res) => {
