@@ -6,23 +6,29 @@ const bcrypt = require('bcryptjs');
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
+    if (!username || !password) {
+        return res.status(400).json({ msg: 'Please enter all fields' });
+    }
+
     try {
-        // Hash the password
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ msg: 'User already exists' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create a new user
         const newUser = new User({
             username,
-            password: hashedPassword,
+            password: hashedPassword
         });
 
-        // Save user to the database
         await newUser.save();
-        res.status(201).send('User registered successfully');
+        res.status(201).json({ msg: 'User registered successfully' });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+        console.error('Error:', err.message);
+        res.status(500).json({ msg: 'Server error' });
     }
 });
 
