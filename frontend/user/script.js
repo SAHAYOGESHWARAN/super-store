@@ -29,4 +29,27 @@ document.getElementById('logout').addEventListener('click', () => {
   }
   
   loadProducts();
+  document.getElementById('product-list').addEventListener('click', async (e) => {
+    if (e.target.classList.contains('add-to-cart')) {
+      const productId = e.target.getAttribute('data-id');
+      
+      // Handle adding product to cart logic here
+      // This might involve calling another API endpoint to manage user cart
+    }
+  });
+  function displayProducts(products) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = '<h2>Product List</h2>';
+    
+    products.forEach(product => {
+      productList.innerHTML += `
+        <div>
+          <h3>${product.name}</h3>
+          <p>Price: $${product.price}</p>
+          <p>Quantity: ${product.quantity}</p>
+          <button class="add-to-cart" data-id="${product._id}">Add to Cart</button>
+        </div>
+      `;
+    });
+  }
   
