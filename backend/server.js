@@ -6,6 +6,7 @@ const productRoutes = require('./routes/productRoutes');
 const path = require('path');
 const cors = require('cors');
 
+
 dotenv.config();
 
 connectDB();
@@ -19,8 +20,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
+// Middleware
+app.use(express.json());
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
+// Use routes
+app.use('/api/users', require('./routes/users'));
+
+// Example route
 app.get('/', (req, res) => {
-    res.send('API is running...');
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
