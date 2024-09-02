@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const Product = require('../models/Product');
-const { auth, adminAuth } = require('../middleware/auth');
+const Product = require('../models/productModel');
+const { auth, adminAuth } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Configure multer for file uploads
