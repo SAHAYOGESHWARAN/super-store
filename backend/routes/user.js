@@ -38,4 +38,18 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+
+// Get all products
+router.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json(products);
+    } catch (err) {
+        console.error('Error:', err.message);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+
+
 module.exports = router;

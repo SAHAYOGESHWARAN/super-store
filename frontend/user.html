@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User - View Products</title>
+    <style>
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <h1>User - View Products</h1>
+    <ul id="productList"></ul>
+
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/user/products');
+                const products = await response.json();
+
+                const productList = document.getElementById('productList');
+                productList.innerHTML = '';
+
+                products.forEach(product => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p>$${product.price}</p>
+                        <button onclick="addToCart('${product._id}')">Add to Cart</button>
+                    `;
+                    productList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function addToCart(productId) {
+            try {
+                const response = await fetch('/api/user/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ productId })
+                });
+
+                const result = await response.json();
+                alert(result.msg);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load products on page load
+        loadProducts();
+    </script>
+</body>
+</html>
