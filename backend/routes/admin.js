@@ -20,7 +20,7 @@ const upload = multer({ storage });
 router.post('/products', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price } = req.body;
-        const image = req.file ? req.file.filename : 'default.jpg';
+        const image = req.file ? req.file.filename : 'default.jpg'; // Default image if no file uploaded
 
         const newProduct = new Product({
             name,
@@ -32,27 +32,8 @@ router.post('/products', upload.single('image'), async (req, res) => {
         await newProduct.save();
         res.json({ msg: 'Product added successfully' });
     } catch (error) {
+        console.error('Error adding product:', error);
         res.status(500).json({ msg: 'Error adding product', error });
-    }
-});
-
-// Get all products
-router.get('/products', async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ msg: 'Error fetching products', error });
-    }
-});
-
-// Delete product
-router.delete('/products/:id', async (req, res) => {
-    try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ msg: 'Product deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Error deleting product', error });
     }
 });
 
