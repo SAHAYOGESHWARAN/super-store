@@ -1,35 +1,27 @@
-document.getElementById('logout').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login/index.html';
-  });
+document.getElementById('product-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const price = document.getElementById('price').value;
+    const quantity = document.getElementById('quantity').value;
   
-  async function loadProducts() {
     try {
       const response = await fetch('http://localhost:5000/api/products', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ name, price, quantity })
       });
   
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error('Failed to add product');
       }
   
-      const products = await response.json();
-      const productList = document.getElementById('product-list');
-  
-      productList.innerHTML = '<h2>Product List</h2>';
-      products.forEach(product => {
-        productList.innerHTML += `
-          <div>
-            <h3>${product.name}</h3>
-            <p>Price: $${product.price}</p>
-            <p>Quantity: ${product.quantity}</p>
-          </div>
-        `;
-      });
+      alert('Product added successfully');
+      loadProducts(); // Refresh the product list
     } catch (error) {
       alert(error.message);
     }
-  }
-  
-  loadProducts();
+  });
   
