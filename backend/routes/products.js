@@ -1,5 +1,6 @@
 const express = require('express');
 const Product = require('../models/product');
+const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -47,5 +48,21 @@ router.delete('/:id', async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
+// Apply middleware to protect routes
+router.post('/', authenticateToken, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
+    // Create Product logic
+  });
+  
+  router.put('/:id', authenticateToken, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
+    // Update Product logic
+  });
+  
+  router.delete('/:id', authenticateToken, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
+    // Delete Product logic
+  });
 
 module.exports = router;
