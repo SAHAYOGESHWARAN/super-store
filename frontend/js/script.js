@@ -181,3 +181,6 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
     }
 });
 
+app.use(express.static('frontend'));
+
+
