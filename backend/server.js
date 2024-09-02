@@ -1,18 +1,25 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer');
-const path = require('path');
-const Product = require('./models/productModel');
+const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+const path = require('path');
+const cors = require('cors');
+const multer = require('multer');
+const Product = require('./models/productModel'); // Import the Product model
+
+dotenv.config();
+connectDB();
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
-
 // Middleware
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -25,7 +32,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// API Routes
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+
+// Admin routes for managing products
 app.post('/api/admin/products', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price } = req.body;
@@ -61,9 +72,16 @@ app.delete('/api/admin/products/:id', async (req, res) => {
     }
 });
 
-// Serve static files
-app.use('/uploads', express.static('uploads'));
+// Serve static files from the frontend directory
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Start server
+// Use user routes
+app.use('/api/users', require('./routes/user'));
+
+// Example route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
