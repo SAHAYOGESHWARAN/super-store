@@ -6,6 +6,22 @@
     <title>Admin - Manage Products</title>
     <style>
         /* Add your styles here */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -19,7 +35,20 @@
     </form>
 
     <h2>Product List</h2>
-    <ul id="productList"></ul>
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productList">
+            <!-- Product rows will be dynamically added here -->
+        </tbody>
+    </table>
 
     <script>
         document.getElementById('productForm').addEventListener('submit', async (event) => {
@@ -66,15 +95,18 @@
                 productList.innerHTML = '';
 
                 products.forEach(product => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;">
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <p>$${product.price}</p>
-                        <button onclick="deleteProduct('${product._id}')">Delete</button>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;"></td>
+                        <td>${product.name}</td>
+                        <td>${product.description}</td>
+                        <td>$${product.price}</td>
+                        <td class="actions">
+                            <button onclick="editProduct('${product._id}')">Edit</button>
+                            <button onclick="deleteProduct('${product._id}')">Delete</button>
+                        </td>
                     `;
-                    productList.appendChild(li);
+                    productList.appendChild(tr);
                 });
             } catch (error) {
                 console.error('Error:', error);
@@ -99,6 +131,12 @@
                 console.error('Error:', error);
                 alert('Error deleting product');
             }
+        }
+
+        function editProduct(productId) {
+            // Implement the edit functionality here
+            // For example, you could pre-fill the form with the product details for editing
+            alert('Edit functionality is not yet implemented.');
         }
 
         // Load products on page load

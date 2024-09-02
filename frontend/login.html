@@ -15,5 +15,60 @@
     </form>
     <p id="loginError" class="error"></p>
 </body>
-<script src="js/script.js"></script>
+<script >document.getElementById('loginForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            // Save token and role in localStorage
+            localStorage.setItem('token', result.token);
+            localStorage.setItem('role', result.role);
+            
+            // Redirect based on role
+            if (result.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else if (result.role === 'user') {
+                window.location.href = 'user.html';
+            }
+        } else {
+            document.getElementById('loginError').textContent = result.msg;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loginError').textContent = 'Login failed. Please try again.';
+    }
+});
+
+// Example login route
+app.post('/api/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        // Your logic for finding and validating the user
+        const user = await User.findOne({ email });
+        if (user && await bcrypt.compare(password, user.password)) {
+            // Generate a token and send the response
+            const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.json({ token, role: user.role });
+        } else {
+            res.status(400).json({ msg: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+
+</script>
 </html>

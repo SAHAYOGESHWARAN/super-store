@@ -152,35 +152,87 @@ async function addToCart(productId) {
     }
 }
 
-document.getElementById('registerForm').addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent default form submission
+document.getElementById('productForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const price = document.getElementById('price').value;
+    const image = document.getElementById('image').files[0];
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    if (image) {
+        formData.append('image', image);
+    }
 
     try {
-        const response = await fetch('/api/users/register', {
+        const response = await fetch('/api/admin/products', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
+            body: formData
         });
 
         const result = await response.json();
-
         if (response.ok) {
             alert(result.msg);
-            // Optionally clear form fields
-            document.getElementById('registerForm').reset();
+            loadProducts();
         } else {
-            document.getElementById('registerError').textContent = result.msg;
+            alert('Error: ' + result.msg);
         }
     } catch (error) {
         console.error('Error:', error);
+        alert('Error adding product');
     }
 });
 
+async function loadProducts() {
+    try {
+        const response = await fetch('/api/admin/products');
+        const products = await response.json();
+
+        const productList = document.getElementById('productList');
+        productList.innerHTML = '';
+
+        products.forEach(product => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p>$${product.price}</p>
+                <button onclick="deleteProduct('${product._id}')">Delete</button>
+            `;
+            productList.appendChild(li);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error loading products');
+    }
+}
+
+async function deleteProduct(productId) {
+    try {
+        const response = await fetch(`/api/admin/products/${productId}`, {
+            method: 'DELETE'
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.msg);
+            loadProducts();
+        } else {
+            alert('Error: ' + result.msg);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting product');
+    }
+}
+
+// Load products on page load
+loadProducts();
 app.use(express.static('frontend'));
 
 
