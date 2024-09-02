@@ -22,3 +22,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     }
   });
   
+  if (user.role === 'admin') {
+    window.location.href = '/admin/index.html';
+  } else {
+    window.location.href = '/user/index.html';
+  }
+  
