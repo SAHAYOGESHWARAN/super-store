@@ -1,68 +1,63 @@
 const express = require('express');
+const router = express.Router();
 const Product = require('../models/product');
 const authenticateToken = require('../middleware/auth');
 
-const router = express.Router();
+// Create a new product
+router.post('/', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).send('Access denied');
 
-// Create Product
-router.post('/', async (req, res) => {
   const { name, price, quantity } = req.body;
+
   try {
-    const newProduct = new Product({ name, price, quantity });
-    await newProduct.save();
-    res.status(201).send('Product added');
-  } catch (err) {
-    res.status(400).send(err.message);
+    const product = new Product({ name, price, quantity });
+    await product.save();
+    res.status(201).send('Product created successfully');
+  } catch (error) {
+    res.status(400).send('Error creating product');
   }
 });
 
-// Get Products
+// Get all products
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products);
-  } catch (err) {
-    res.status(400).send(err.message);
+  } catch (error) {
+    res.status(500).send('Server error');
   }
 });
 
-// Update Product
-router.put('/:id', async (req, res) => {
-  const { id } = req.params;
+// Update a product
+router.put('/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).send('Access denied');
+
   const { name, price, quantity } = req.body;
+
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(id, { name, price, quantity }, { new: true });
-    res.json(updatedProduct);
-  } catch (err) {
-    res.status(400).send(err.message);
+    const product = await Product.findByIdAndUpdate(req.params.id, { name, price, quantity }, { new: true });
+
+    if (!product) return res.status(404).send('Product not found');
+
+    res.json(product);
+  } catch (error) {
+    res.status(400).send('Error updating product');
   }
 });
 
-// Delete Product
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
+// Delete a product
+router.delete('/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).send('Access denied');
+
   try {
-    await Product.findByIdAndDelete(id);
-    res.send('Product deleted');
-  } catch (err) {
-    res.status(400).send(err.message);
+    const product = await Product.findByIdAndDelete(req.params.id);
+
+    if (!product) return res.status(404).send('Product not found');
+
+    res.send('Product deleted successfully');
+  } catch (error) {
+    res.status(500).send('Server error');
   }
 });
-
-// Apply middleware to protect routes
-router.post('/', authenticateToken, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
-    // Create Product logic
-  });
-  
-  router.put('/:id', authenticateToken, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
-    // Update Product logic
-  });
-  
-  router.delete('/:id', authenticateToken, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).send('Access denied');
-    // Delete Product logic
-  });
 
 module.exports = router;
