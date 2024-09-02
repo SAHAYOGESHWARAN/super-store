@@ -152,7 +152,9 @@ async function addToCart(productId) {
     }
 }
 
-async function registerUser() {
+document.getElementById('registerForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
@@ -169,11 +171,13 @@ async function registerUser() {
 
         if (response.ok) {
             alert(result.msg);
+            // Optionally clear form fields
+            document.getElementById('registerForm').reset();
         } else {
-            alert(result.msg);
+            document.getElementById('registerError').textContent = result.msg;
         }
     } catch (error) {
         console.error('Error:', error);
     }
-}
+});
 
