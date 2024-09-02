@@ -113,3 +113,41 @@ async function deleteProduct(id) {
 
 loadProducts();
 
+document.addEventListener('DOMContentLoaded', loadProducts);
+
+async function loadProducts() {
+    const res = await fetch('/api/products');
+    const products = await res.json();
+
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+
+    products.forEach(product => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <img src="/uploads/${product.image}" alt="${product.name}" style="width:100px;height:auto;">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <p>$${product.price}</p>
+            <button onclick="addToCart('${product._id}')">Add to Cart</button>
+        `;
+        productList.appendChild(li);
+    });
+}
+
+async function addToCart(productId) {
+    const res = await fetch(`/api/cart`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ productId })
+    });
+
+    if (res.status === 201) {
+        alert('Product added to cart');
+    } else {
+        alert('Failed to add product to cart');
+    }
+}
