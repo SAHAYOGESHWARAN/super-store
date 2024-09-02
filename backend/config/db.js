@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 // Load environment variables from .env file
 dotenv.config();
 
+// Log MONGO_URI to verify it's loaded correctly
+console.log('MongoDB URI:', process.env.MONGO_URI);
+
 // Function to connect to MongoDB
 const connectDB = async () => {
     try {
