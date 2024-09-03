@@ -106,7 +106,7 @@ app.post('/api/users/register', async (req, res) => {
             username,
             email,
             password: await bcrypt.hash(password, 10),
-            role, // Save the role in the database
+            role, 
         });
 
         await user.save();
@@ -119,7 +119,6 @@ app.post('/api/users/register', async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 });
-
 
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
