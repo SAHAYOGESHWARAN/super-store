@@ -5,36 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart</title>
     <style>
-        /* Add your styles here */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+        }
+        li {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .total {
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .loading {
+            font-size: 16px;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
     <h1>Your Cart</h1>
+    <div class="loading" id="loadingMessage">Loading cart...</div>
     <ul id="cartList"></ul>
+    <div class="total" id="totalPrice">Total Price: $0.00</div>
     <button onclick="checkout('cash')">Pay with Cash</button>
     <button onclick="checkout('phonepe')">Pay with PhonePe</button>
 
     <script>
         async function loadCart() {
-            try {
-                const response = await fetch('/api/cart');
-                const cart = await response.json();
+            document.getElementById('loadingMessage').style.display = 'block';
 
+            try {
+                const response = await fetch('/api/cart', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (!response.ok) throw new Error('Network response was not ok.');
+
+                const cart = await response.json();
                 const cartList = document.getElementById('cartList');
+                const totalPriceElem = document.getElementById('totalPrice');
+
                 cartList.innerHTML = '';
+                let totalPrice = 0;
 
                 cart.products.forEach(item => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <h3>${item.product.name}</h3>
-                        <p>${item.product.description}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        <p>Price: $${item.product.price}</p>
+                        <div>
+                            <h3>${item.product.name}</h3>
+                            <p>${item.product.description}</p>
+                            <p>Quantity: ${item.quantity}</p>
+                            <p>Price: $${item.product.price}</p>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart('${item.product._id}')">Remove</button>
                     `;
                     cartList.appendChild(li);
+                    totalPrice += item.product.price * item.quantity;
                 });
+
+                totalPriceElem.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading cart:', error);
+                alert('Failed to load cart. Please try again later.');
+            } finally {
+                document.getElementById('loadingMessage').style.display = 'none';
+            }
+        }
+
+        async function removeFromCart(productId) {
+            try {
+                const response = await fetch('/api/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ productId })
+                });
+
+                if (!response.ok) throw new Error('Failed to remove product from cart.');
+
+                const result = await response.json();
+                alert(result.msg);
+                loadCart(); // Refresh cart after removal
+            } catch (error) {
+                console.error('Error removing from cart:', error);
+                alert('Failed to remove product from cart.');
             }
         }
 
@@ -49,11 +144,14 @@
                     body: JSON.stringify({ paymentMethod })
                 });
 
+                if (!response.ok) throw new Error('Failed to process checkout.');
+
                 const result = await response.json();
                 alert(result.msg);
                 loadCart(); // Refresh cart after checkout
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error during checkout:', error);
+                alert('Failed to process checkout. Please try again later.');
             }
         }
 
