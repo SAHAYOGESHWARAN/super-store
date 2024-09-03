@@ -25,7 +25,7 @@
         h1 {
             margin-bottom: 20px;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -57,43 +57,46 @@
             <input type="text" id="username" placeholder="Username" required>
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
+            <select id="role" required>
+                <option value="" disabled selected>Select role</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
             <button type="submit">Register</button>
             <p id="registerError" class="error"></p>
         </form>
-        
     </div>
     <script>
-       document.getElementById('registerForm').addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent default form submission
+        document.getElementById('registerForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
 
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value; // Get the role value
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value; // Get the role value
 
-    try {
-        const response = await fetch('/api/users/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password, role }) // Include the role
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password, role }) // Include the role
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.msg);
+                    document.getElementById('registerForm').reset();
+                } else {
+                    document.getElementById('registerError').textContent = result.msg;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('registerError').textContent = 'An error occurred. Please try again.';
+            }
         });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.msg);
-            document.getElementById('registerForm').reset();
-        } else {
-            document.getElementById('registerError').textContent = result.msg;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('registerError').textContent = 'An error occurred. Please try again.';
-    }
-});
-
     </script>
 </body>
 </html>

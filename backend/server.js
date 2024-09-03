@@ -106,19 +106,20 @@ app.post('/api/users/register', async (req, res) => {
             username,
             email,
             password: await bcrypt.hash(password, 10),
-            role,
+            role, // Save the role in the database
         });
 
         await user.save();
         res.status(201).json({ msg: 'User registered successfully' });
     } catch (error) {
-        if (error.code === 11000) {
+        if (error.code === 11000) { // Handle duplicate key error
             return res.status(400).json({ msg: 'Username or email already exists' });
         }
         console.error('Error:', error);
         res.status(500).json({ msg: 'Server error' });
     }
 });
+
 
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -133,3 +134,15 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+// Backend: Fetch products for the user
+app.get('/api/user/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Error fetching products' });
+    }
+});
