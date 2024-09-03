@@ -187,6 +187,7 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     }
 });
 
+
 async function loadProducts() {
     try {
         const response = await fetch('/api/admin/products');
