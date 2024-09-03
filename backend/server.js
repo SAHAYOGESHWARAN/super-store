@@ -91,6 +91,43 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+app.post('/api/users/register', async (req, res) => {
+    const { username, email, password, role } = req.body;
+
+    try {
+        const user = new User({
+            email,
+            password: await bcrypt.hash(password, 10),
+            role, // Make sure the role is being saved
+        });
+
+        await user.save();
+        res.status(201).json({ msg: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+
+app.post('/api/users/register', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    try {
+        const user = new User({
+            email,
+            password: await bcrypt.hash(password, 10),
+            role: 'user', // Automatically assign the role
+        });
+
+        await user.save();
+        res.status(201).json({ msg: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+
+
 
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
