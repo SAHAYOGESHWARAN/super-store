@@ -146,3 +146,5 @@ app.get('/api/user/products', async (req, res) => {
         res.status(500).json({ msg: 'Error fetching products' });
     }
 });
+
+
