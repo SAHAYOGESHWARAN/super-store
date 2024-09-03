@@ -74,6 +74,7 @@
                 });
             } catch (error) {
                 console.error('Error loading products:', error);
+                alert('Failed to load products. Please try again later.');
             }
         }
 
@@ -95,14 +96,18 @@
                     body: JSON.stringify({ productId })
                 });
 
-                if (!response.ok) throw new Error('Failed to add product to cart.');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.msg || 'Failed to add product to cart.');
+                }
+                
                 const result = await response.json();
                 alert(result.msg);
                 // Redirect to the cart page
                 window.location.href = 'cart.html';
             } catch (error) {
                 console.error('Error adding to cart:', error);
-                alert('Failed to add product to cart.');
+                alert('Failed to add product to cart. Please try again later.');
             }
         }
 
