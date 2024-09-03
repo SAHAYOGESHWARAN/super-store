@@ -67,7 +67,7 @@
                         <h3>${product.name}</h3>
                         <p>${product.description}</p>
                         <p>$${product.price}</p>
-                        <button onclick="addToCart('${product._id}')">Add to Cart</button>
+                       <button onclick="addToCart('${product._id}')">Add to Cart</button>
                     `;
                     productList.appendChild(li);
                 });
@@ -97,7 +97,8 @@
         // Load products on page load
         loadProducts();
     </script>
-    <button onclick="addToCart('${product._id}')">Add to Cart</button>
+  
+  
 
 </body>
 </html>
