@@ -152,6 +152,7 @@ async function addToCart(productId) {
     }
 }
 
+
 document.getElementById('productForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
