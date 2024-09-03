@@ -32,6 +32,7 @@ router.post('/products', upload.single('image'), async (req, res) => {
         await newProduct.save();
         res.json({ msg: 'Product added successfully' });
     } catch (error) {
+        
         console.error('Error adding product:', error);
         res.status(500).json({ msg: 'Error adding product', error });
     }
