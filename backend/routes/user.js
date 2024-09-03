@@ -38,8 +38,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
-
 // Get all products
 router.get('/products', async (req, res) => {
     try {
