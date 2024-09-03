@@ -9,7 +9,9 @@ const User = require('./models/userModel');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const Product = require('./models/productModel'); // Import the Product model
+const Product = require('./models/productModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 connectDB();
@@ -20,13 +22,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-
-app.use('/api/auth', authRoutes);
-mongoose.connect('mongodb://localhost:27017/muruganStore', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-});
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -82,7 +77,7 @@ app.delete('/api/admin/products/:id', async (req, res) => {
     }
 });
 
-
+// Authentication Routes
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -102,26 +97,13 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/users/register', async (req, res) => {
     const { username, email, password, role } = req.body;
 
-    try {
-        const user = new User({
-            email,
-            password: await bcrypt.hash(password, 10),
-            role, // Make sure the role is being saved
-        });
-
-        await user.save();
-        res.status(201).json({ msg: 'User registered successfully' });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ msg: 'Server error' });
+    if (!username || !email || !password || !role) {
+        return res.status(400).json({ msg: 'Please provide all required fields' });
     }
-});
-
-app.post('/api/users/register', async (req, res) => {
-    const { email, password, role } = req.body;
 
     try {
         const user = new User({
+            username,
             email,
             password: await bcrypt.hash(password, 10),
             role,
@@ -130,11 +112,13 @@ app.post('/api/users/register', async (req, res) => {
         await user.save();
         res.status(201).json({ msg: 'User registered successfully' });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ msg: 'Username or email already exists' });
+        }
         console.error('Error:', error);
         res.status(500).json({ msg: 'Server error' });
     }
 });
-
 
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
