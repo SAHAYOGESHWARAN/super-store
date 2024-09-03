@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Add to cart
 router.post('/cart', authMiddleware, async (req, res) => {
     const { productId } = req.body;
-    const userId = req.user.id; // Assuming you use JWT and authMiddleware
+    const userId = req.user.id; 
 
     try {
         let cart = await Cart.findOne({ user: userId });
