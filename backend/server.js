@@ -4,7 +4,10 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const path = require('path');
+const mongoose = require('mongoose');
+const User = require('./models/userModel');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const multer = require('multer');
 const Product = require('./models/productModel'); // Import the Product model
 
@@ -19,6 +22,11 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+mongoose.connect('mongodb://localhost:27017/muruganStore', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+});
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -110,13 +118,13 @@ app.post('/api/users/register', async (req, res) => {
 });
 
 app.post('/api/users/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { email, password, role } = req.body;
 
     try {
         const user = new User({
             email,
             password: await bcrypt.hash(password, 10),
-            role: 'user', // Automatically assign the role
+            role,
         });
 
         await user.save();
@@ -126,7 +134,6 @@ app.post('/api/users/register', async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 });
-
 
 
 // Serve static files from the frontend directory
