@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+
 // Delete a product
 router.delete('/:id', [auth, adminAuth], async (req, res) => {
     try {
