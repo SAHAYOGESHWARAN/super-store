@@ -72,6 +72,24 @@ app.delete('/api/admin/products/:id', async (req, res) => {
     }
 });
 
+
+app.post('/api/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (user && await bcrypt.compare(password, user.password)) {
+            const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.json({ token, role: user.role });
+        } else {
+            res.status(400).json({ msg: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+
+
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
 
