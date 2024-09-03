@@ -56,18 +56,18 @@
             try {
                 const response = await fetch('/api/user/products');
                 const products = await response.json();
-
+    
                 const productList = document.getElementById('productList');
                 productList.innerHTML = '';
-
+    
                 products.forEach(product => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <img src="/uploads/${product.image}" alt="${product.name}">
+                        <img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;">
                         <h3>${product.name}</h3>
                         <p>${product.description}</p>
                         <p>$${product.price}</p>
-                       <button onclick="addToCart('${product._id}')">Add to Cart</button>
+                        <button onclick="addToCart('${product._id}')">Add to Cart</button>
                     `;
                     productList.appendChild(li);
                 });
@@ -75,7 +75,7 @@
                 console.error('Error:', error);
             }
         }
-
+    
         async function addToCart(productId) {
             try {
                 const response = await fetch('/api/user/cart', {
@@ -86,17 +86,20 @@
                     },
                     body: JSON.stringify({ productId })
                 });
-
+    
                 const result = await response.json();
                 alert(result.msg);
+                // Redirect to the cart page
+                window.location.href = 'cart.html';
             } catch (error) {
                 console.error('Error:', error);
             }
         }
-
+    
         // Load products on page load
         loadProducts();
     </script>
+    
   
   
 
