@@ -55,15 +55,16 @@
         async function loadProducts() {
             try {
                 const response = await fetch('/api/user/products');
+                if (!response.ok) throw new Error('Network response was not ok.');
                 const products = await response.json();
-    
+
                 const productList = document.getElementById('productList');
                 productList.innerHTML = '';
-    
+
                 products.forEach(product => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <img src="/uploads/${product.image}" alt="${product.name}" style="width: 100px;">
+                        <img src="/uploads/${product.image}" alt="${product.name}">
                         <h3>${product.name}</h3>
                         <p>${product.description}</p>
                         <p>$${product.price}</p>
@@ -72,36 +73,41 @@
                     productList.appendChild(li);
                 });
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading products:', error);
             }
         }
-    
+
         async function addToCart(productId) {
             try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('You need to log in first.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 const response = await fetch('/api/user/cart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ productId })
                 });
-    
+
+                if (!response.ok) throw new Error('Failed to add product to cart.');
                 const result = await response.json();
                 alert(result.msg);
                 // Redirect to the cart page
                 window.location.href = 'cart.html';
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error adding to cart:', error);
+                alert('Failed to add product to cart.');
             }
         }
-    
+
         // Load products on page load
         loadProducts();
     </script>
-    
-  
-  
-
 </body>
 </html>
