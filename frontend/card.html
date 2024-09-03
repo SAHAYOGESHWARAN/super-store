@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <style>
+        /* Add your styles here */
+    </style>
+</head>
+<body>
+    <h1>Your Cart</h1>
+    <ul id="cartList"></ul>
+    <button onclick="checkout('cash')">Pay with Cash</button>
+    <button onclick="checkout('phonepe')">Pay with PhonePe</button>
+
+    <script>
+        async function loadCart() {
+            try {
+                const response = await fetch('/api/cart');
+                const cart = await response.json();
+
+                const cartList = document.getElementById('cartList');
+                cartList.innerHTML = '';
+
+                cart.products.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <h3>${item.product.name}</h3>
+                        <p>${item.product.description}</p>
+                        <p>Quantity: ${item.quantity}</p>
+                        <p>Price: $${item.product.price}</p>
+                    `;
+                    cartList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function checkout(paymentMethod) {
+            try {
+                const response = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ paymentMethod })
+                });
+
+                const result = await response.json();
+                alert(result.msg);
+                loadCart(); // Refresh cart after checkout
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load cart on page load
+        loadCart();
+    </script>
+</body>
+</html>
