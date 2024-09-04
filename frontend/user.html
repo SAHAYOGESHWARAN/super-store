@@ -13,6 +13,7 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
+
         h1 {
             margin-bottom: 20px;
         }
@@ -53,6 +54,7 @@
 
     <script>
         async function loadProducts() {
+             "store"
             try {
                 const response = await fetch('/api/user/products');
                 if (!response.ok) throw new Error('Network response was not ok.');
@@ -70,6 +72,7 @@
                         <p>$${product.price}</p>
                         <button onclick="addToCart('${product._id}')">Add to Cart</button>
                     `;
+
                     productList.appendChild(li);
                 });
             } catch (error) {
@@ -106,13 +109,15 @@
                 // Redirect to the cart page
                 window.location.href = 'cart.html';
             } catch (error) {
-                
+
                 console.error('Error adding to cart:', error);
                 alert('Failed to add product to cart. Please try again later.');
             }
         }
 
-        // Load products on page load
+   
+
+        
         loadProducts();
     </script>
 </body>
