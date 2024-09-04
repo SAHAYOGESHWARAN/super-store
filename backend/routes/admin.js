@@ -20,7 +20,7 @@ const upload = multer({ storage });
 router.post('/products', upload.single('image'), async (req, res) => {
     try {
         const { name, description, price } = req.body;
-        const image = req.file ? req.file.filename : 'default.jpg'; // Default image if no file uploaded
+        const image = req.file ? req.file.filename : 'default.jpg';
 
         const newProduct = new Product({
             name,
@@ -32,7 +32,7 @@ router.post('/products', upload.single('image'), async (req, res) => {
         await newProduct.save();
         res.json({ msg: 'Product added successfully' });
     } catch (error) {
-        
+
         console.error('Error adding product:', error);
         res.status(500).json({ msg: 'Error adding product', error });
     }
